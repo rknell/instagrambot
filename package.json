@@ -1,0 +1,16 @@
+{
+  "name": "instagrambot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "instagram-private-api": "https://github.com/jamespacileo/instagram-private-api.git",
+    "moment": "^2.21.0",
+    "node-schedule": "^1.3.0"
+  }
+}
