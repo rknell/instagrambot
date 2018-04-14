@@ -72,3 +72,7 @@ nodeSchedule.scheduleJob('0 0 6,12,17 ? * * *', ()=>{
 })
 
 nodeSchedule.scheduleJob('0 0 4 ? * * *', unfollowNotFollowing)
+
+setInterval(()=>{
+  //keep alive
+}, 1000*60);
