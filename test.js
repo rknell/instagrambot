@@ -44,6 +44,7 @@ const likeAndFollow = async () => {
     if(followCount < MAX_FOLLOW){
       for(let media of likeAndFollow){
         followCount ++;
+        likeCount++;
         await instagramBot.likeAndFollow(media.username, media.mediaId)
       }
     }
