@@ -71,4 +71,4 @@ nodeSchedule.scheduleJob('0 0 6,12,17 ? * * *', ()=>{
   likeAndFollow()
 })
 
-nodeSchedule.scheduleJob('0 0 4 ? * * *', unfollowNotFollowing())
+nodeSchedule.scheduleJob('0 0 4 ? * * *', unfollowNotFollowing)
