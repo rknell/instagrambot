@@ -12,6 +12,8 @@ const unfollowNotFollowing = async () => {
     await instagramBot.unfollowNotFollowing()
   } catch (e) {
     console.error(e)
+  } finally {
+    console.log('Unfollow finished, next run', unfollowJob.nextInvocation()._date.format('HH:mm DD/MM'))
   }
 }
 
@@ -57,7 +59,7 @@ const likeAndFollow = async () => {
       await instagramBot.randomPause(60*3)
       likeAndFollow()
     } else {
-      //Do nothing
+      console.log('Like and follow finished, next run',likeAndFollowJob.nextInvocation()._date.format('HH:mm DD/MM'))
     }
   }
 }
