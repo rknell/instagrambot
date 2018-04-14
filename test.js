@@ -3,8 +3,8 @@ const nodeSchedule = require('node-schedule')
 
 let likeCount = 0
 let followCount = 0
-const MAX_LIKE = 300/3
-const MAX_FOLLOW = 200/3
+const MAX_LIKE = Math.ceil(300/3)
+const MAX_FOLLOW = Math.ceil(200/3)
 
 const unfollowNotFollowing = async () => {
   const instagramBot = new InstagramBot(process.env.USERNAME, process.env.PASSWORD)
@@ -16,7 +16,7 @@ const unfollowNotFollowing = async () => {
 }
 
 const likeAndFollow = async () => {
-  const instagramBot = new InstagramBot(process.env.USERNAME, process.end.PASSWORD)
+  const instagramBot = new InstagramBot(process.env.USERNAME, process.env.PASSWORD)
   try {
     const data = (await instagramBot.hashtag(process.env.HASHTAG)).map(item => {
       return {
@@ -36,7 +36,7 @@ const likeAndFollow = async () => {
       for(let media of like){
         await instagramBot.like(media.mediaId)
         likeCount++;
-        await instagramBot.randomPause(10)
+        await instagramBot.randomPause(3)
       }
     }
 
@@ -53,7 +53,7 @@ const likeAndFollow = async () => {
     console.error(e)
   } finally {
     if(likeCount < MAX_LIKE && followCount < MAX_FOLLOW){
-      console.log("Sleeping")
+      console.log("Sleeping", MAX_LIKE-likeCount, MAX_FOLLOW-followCount)
       await instagramBot.randomPause(60*3)
       likeAndFollow()
     } else {
@@ -66,14 +66,13 @@ const pausePromise = (milliseconds) => new Promise((resolve, reject) => {
   setTimeout(resolve, milliseconds)
 })
 
-nodeSchedule.scheduleJob('0 0 6,12,17 ? * * *', ()=>{
+const likeAndFollowJob = nodeSchedule.scheduleJob('Like and follow','0 39 7,13,18 * * * *', ()=>{
   followCount = 0;
   likeCount = 0;
   likeAndFollow()
 })
 
-nodeSchedule.scheduleJob('0 0 4 ? * * *', unfollowNotFollowing)
+const unfollowJob = nodeSchedule.scheduleJob('Unfollow','0 0 5 * * * *', unfollowNotFollowing)
 
-setInterval(()=>{
-  //keep alive
-}, 1000*60);
+console.log('Like and follow next run', likeAndFollowJob.nextInvocation()._date.format('HH:mm DD/MM'))
+console.log('Unfollow next run', unfollowJob.nextInvocation()._date.format('HH:mm DD/MM'))
