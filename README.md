@@ -1,4 +1,4 @@
-#InstagramBot#
+# InstagramBot
 
 Yet another bot trying to give you a small advantage by manipulating the goodwill of others.
 
