@@ -1,4 +1,4 @@
-#InstagramBot
+#InstagramBot#
 Yet another bot trying to give you a small advantage by manipulating the goodwill of others.
 
 It will like and follow users of a hashtag of your choice, three times a day, and unfollow everyone who doesn't follow you back in the morning before starting work.
