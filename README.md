@@ -24,11 +24,11 @@ module.exports = {
   apps : [
     {
       name      : 'InstagramBot',
-      script    : 'test.js',
+      script    : 'app.js',
       env: {
         USERNAME: 'instagram_username',
         PASSWORD: 'instagram_password',
-        HASHTAG: 'hashtag_to_stalk'
+        HASHTAG: 'hashtag_to_stalk,different_hashtag_to_stalk'
       }
     }
   ]
