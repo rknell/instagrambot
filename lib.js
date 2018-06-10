@@ -7,12 +7,13 @@ class InstagramBot {
     this.storage = new Client.CookieFileStorage(__dirname + `/cookies/${username}.json`)
     this.username = username
     this.password = password
+    this.proxy = "http://zach@donohue.im:rm250005@au54.nordvpn.com"
     this.randomPause = randomPause
   }
 
   async _getSession () {
     if (!this._session) {
-      this._session = await Client.Session.create(this.device, this.storage, this.username, this.password)
+      this._session = await Client.Session.create(this.device, this.storage, this.username, this.password, this.proxy)
     }
     return this._session
   }
@@ -65,8 +66,9 @@ class InstagramBot {
     })
     if (notFollowingBack.length) {
       const unfollowNumber = Math.ceil(notFollowingBack.length)
-      console.log('Numbers', followers.length, following.length,notFollowingBack.length, unfollowNumber)
-      for (let i = 0; i < unfollowNumber; i++) {
+
+        console.log('Numbers', 'Followers:', followers.length, 'Following:', following.length, 'About to Unfollow:', notFollowingBack.length, 'New Follow Total:', (following.length - unfollowNumber))
+        for (let i = 0; i < unfollowNumber; i++) {
         const user = notFollowingBack[notFollowingBack.length - 1 - i]
         if (user) {
           try {
@@ -79,12 +81,16 @@ class InstagramBot {
           }
         }
       }
-      // const nextUnfollow = getRandomInt(1000 * 60 * 3, 1000 * 60 * 7)
-      // const nextUnfollowMinutes = Math.floor(nextUnfollow / (1000 * 60))
-      // console.log(`Next unfollow in ${nextUnfollowMinutes} minutes (${moment().add(nextUnfollowMinutes, 'minutes').format('HH:mm')})`)
-      // await pausePromise(nextUnfollow) //Unfollow 1 every 30 minutes
-      // return this.unfollowNotFollowing() //loop back around and get a fresh list
     }
+      const newfollows = following.length - notFollowingBack.length;
+      const numbers = moment().unix() + ' ' + followers.length + ' ' + newfollows;
+      const fs = require('fs');
+      fs.appendFile("logs/" + process.env.USERNAME + '.txt', numbers + '\n', (err) => {
+
+          if (err) throw err;
+
+          console.log('Info saved!');
+      });
   }
 
   async hashtag (hashtag) {
