@@ -7,7 +7,7 @@ class InstagramBot {
     this.storage = new Client.CookieFileStorage(__dirname + `/cookies/${username}.json`)
     this.username = username
     this.password = password
-    this.proxy = "http://zach@donohue.im:rm250005@au54.nordvpn.com"
+    this.proxy = "http://username:password@your_proxy.com"
     this.randomPause = randomPause
   }
 
