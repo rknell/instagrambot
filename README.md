@@ -27,7 +27,7 @@ module.exports = {
     {
       name      : 'InstagramBot',
       script    : 'app.js',
-           cron_restart: "0 0 * * *",
+      cron_restart: "0 0 * * *",
       env: {
         USERNAME: 'instagram_username',
         PASSWORD: 'instagram_password',
