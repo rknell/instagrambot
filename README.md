@@ -13,6 +13,8 @@ To use:
 - Change to project directory and run `npm install`
 - Install PM2 to keep it alive:
 `npm install -g pm2`
+- Create a /cookies directory
+- Create a /logs directory
 - Create an ecosystem.config.js file in the root of the project:
 
 *ecosystem.config.js*
@@ -25,6 +27,7 @@ module.exports = {
     {
       name      : 'InstagramBot',
       script    : 'app.js',
+      cron_restart: "0 0 * * *",
       env: {
         USERNAME: 'instagram_username',
         PASSWORD: 'instagram_password',

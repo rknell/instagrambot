@@ -61,15 +61,24 @@ function shuffle(a) {
   return a;
 }
 
-const likeAndFollowJob = nodeSchedule.scheduleJob('Like and follow', '0 0 7,13,18 * * * *', () => {
-  followCount = 0
-  likeCount = 0
-  setTimeout(likeAndFollow, 1000 * getRandomInt(60*60, 0))
+const followMins = Math.floor(Math.random() * 59);
+const followHour1 = Math.floor(Math.random() * ((11) - 6 + 1)) + 6;
+const followHour2 = Math.floor(Math.random() * ((18) - 12 + 1)) + 12;
+const followHour3 = Math.floor(Math.random() * ((23) - 19 + 1)) + 19;
+
+let followTimes = '0 ' + followMins + ' ' + followHour1 + ',' + followHour2 + ',' + followHour3 +  ' * * * *';
+const likeAndFollowJob = nodeSchedule.scheduleJob('Like and follow', followTimes, () => {
+    followCount = 0
+    likeCount = 0
+    setTimeout(likeAndFollow, 1000 * getRandomInt(60 * 60, 0))
 })
 
-const unfollowJob = nodeSchedule.scheduleJob('Unfollow', '0 0 5 * * * *', unfollowNotFollowing)
+const unfollowHours = Math.floor(Math.random() * (5 - 3 + 1)) + 3;
+const unfollowMins = '0 ' + Math.floor(Math.random() * 59) + ' ' + unfollowHours + ' * * * *';
+const unfollowJob = nodeSchedule.scheduleJob('Unfollow', unfollowMins, unfollowNotFollowing);
 
 console.log('Like and follow next run', likeAndFollowJob.nextInvocation()._date.format('HH:mm DD/MM'))
 console.log('Unfollow next run', unfollowJob.nextInvocation()._date.format('HH:mm DD/MM'))
 
-likeAndFollow()
+// likeAndFollow()
+unfollowNotFollowing()
