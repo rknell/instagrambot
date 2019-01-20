@@ -38,15 +38,15 @@ class InstagramBot {
   }
 
   async followers () {
-    const session = await this._getSession();
-    const feed = new Client.Feed.AccountFollowers(await this._getSession(), await session.getAccountId())
+    const session = await this._getSession()
+    const feed = new Client.Feed.AccountFollowers(session, await session.getAccountId())
     feed.map = item => item._params
     return await feed.all()
   }
 
   async following () {
-    const session = await this._getSession();
-    const feed = new Client.Feed.AccountFollowing(await this._getSession(), await session.getAccountId())
+    const session = await this._getSession()
+    const feed = new Client.Feed.AccountFollowing(session, await session.getAccountId())
     feed.map = item => item._params
     return await feed.all()
   }
@@ -54,7 +54,6 @@ class InstagramBot {
   async unfollowNotFollowing () {
     const followers = await this.followers()
     const following = await this.following()
-
 
     const notFollowingBack = following.filter(following => {
       let isFollowingBack = false
@@ -65,7 +64,7 @@ class InstagramBot {
     })
     if (notFollowingBack.length) {
       const unfollowNumber = Math.ceil(notFollowingBack.length)
-      console.log('Numbers', followers.length, following.length,notFollowingBack.length, unfollowNumber)
+      console.log('Numbers', followers.length, following.length, notFollowingBack.length, unfollowNumber)
       for (let i = 0; i < unfollowNumber; i++) {
         const user = notFollowingBack[notFollowingBack.length - 1 - i]
         if (user) {
@@ -79,11 +78,6 @@ class InstagramBot {
           }
         }
       }
-      // const nextUnfollow = getRandomInt(1000 * 60 * 3, 1000 * 60 * 7)
-      // const nextUnfollowMinutes = Math.floor(nextUnfollow / (1000 * 60))
-      // console.log(`Next unfollow in ${nextUnfollowMinutes} minutes (${moment().add(nextUnfollowMinutes, 'minutes').format('HH:mm')})`)
-      // await pausePromise(nextUnfollow) //Unfollow 1 every 30 minutes
-      // return this.unfollowNotFollowing() //loop back around and get a fresh list
     }
   }
 
@@ -93,6 +87,31 @@ class InstagramBot {
     return await feed.get()
   }
 
+  async userMedia (userId, limit = 5) {
+    const feed = new Client.Feed.UserMedia(await this._getSession(), userId, limit)
+    const data = feed.get()
+    return data.map(item => item._params)
+  }
+
+  async myMedia (limit = 10) {
+    const session = await this._getSession()
+    const feed = new Client.Feed.UserMedia(session, await session.getAccountId(), limit)
+    const data = feed.get()
+    return data.map(item => item._params)
+  }
+
+  async getLikers(mediaId) {
+    const session = await this._getSession()
+    return new Client.Media.likers(session,mediaId)
+  }
+
+  async userLastPostDate(userId) {
+    const media = await this.userMedia(userId)
+    if(media && media[0]){
+      return moment(media[0].takenAt)
+    }
+  }
+
   async likeAndFollow (username, mediaId) {
     await this.like(mediaId)
     await randomPause(3)
@@ -100,10 +119,10 @@ class InstagramBot {
     await randomPause(3)
   }
 
-  async likeAndFollowHashtag(hashtag, maxLike = 100, maxFollow = 60, maxAge = 5) {
+  async likeAndFollowHashtag (hashtag, maxLike = 100, maxFollow = 60, maxAge = 5) {
     console.log(`Liking and following ${hashtag}`, maxLike, maxFollow)
-    let likeCount = 0;
-    let followCount = 0;
+    let likeCount = 0
+    let followCount = 0
     const data = (await this.hashtag(hashtag)).map(hashtag => {
       return {
         mediaId: hashtag._params.id,
@@ -118,18 +137,18 @@ class InstagramBot {
     const like = data.filter(item => {return item.following && !item.hasLiked && item.age <= maxAge})
     const likeAndFollow = data.filter(item => {return !item.following && !item.followingPending && !item.hasLiked && item.age <= maxAge})
 
-    if(likeCount < maxLike){
-      for(let media of like){
+    if (likeCount < maxLike) {
+      for (let media of like) {
         await this.like(media.mediaId)
-        likeCount++;
+        likeCount++
         await this.randomPause(3)
       }
     }
 
-    if(followCount < maxFollow){
-      for(let media of likeAndFollow){
-        followCount ++;
-        likeCount++;
+    if (followCount < maxFollow) {
+      for (let media of likeAndFollow) {
+        followCount++
+        likeCount++
         await this.likeAndFollow(media.username, media.mediaId)
       }
     }
@@ -150,5 +169,6 @@ const randomPause = seconds => new Promise(resolve => {
 const pausePromise = (milliseconds) => new Promise((resolve, reject) => {
   setTimeout(resolve, milliseconds)
 })
+
 
 module.exports = InstagramBot
