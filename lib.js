@@ -51,6 +51,13 @@ class InstagramBot {
     return await feed.all()
   }
 
+  async timeline(){
+    const session = await this._getSession()
+    const feed = new Client.Feed.Timeline(session, await session.getAccountId())
+    feed.map = item => item._params
+    return await feed.get()
+  }
+
   async unfollowNotFollowing () {
     const followers = await this.followers()
     const following = await this.following()
@@ -155,7 +162,6 @@ class InstagramBot {
 
     return {likeCount, followCount}
   }
-
 }
 
 function getRandomInt (min, max) {
@@ -165,10 +171,5 @@ function getRandomInt (min, max) {
 const randomPause = seconds => new Promise(resolve => {
   setTimeout(resolve, 1000 * getRandomInt(seconds / 2, seconds * 2))
 })
-
-const pausePromise = (milliseconds) => new Promise((resolve, reject) => {
-  setTimeout(resolve, milliseconds)
-})
-
 
 module.exports = InstagramBot
