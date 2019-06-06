@@ -5,6 +5,7 @@ let likeCount = 0
 let followCount = 0
 let maxLike = 100
 let maxFollow = 60
+let isBanned = false
 const HASHTAGS = process.env.HASHTAG.split(',')
 
 const unfollowNotFollowing = async () => {
@@ -22,21 +23,28 @@ const likeAndFollow = async () => {
   const instagramBot = new InstagramBot(process.env.USERNAME, process.env.PASSWORD)
   randomLikeAndFollowCounts()
   shuffle(HASHTAGS)
+  let isStillBanned = false
   try {
     for (let hashtag of HASHTAGS) {
       const results = await instagramBot.likeAndFollowHashtag(hashtag, maxLike - likeCount, maxFollow - followCount)
       likeCount += results.likeCount
       followCount += results.followCount
     }
+    isBanned = false
   } catch (e) {
-    console.error(e)
+    if (e.name && e.name === 'ActionSpamError') {
+      isBanned = true
+      isStillBanned = true
+    }
+    console.error(e, 'isBanned', isBanned, isStillBanned)
   } finally {
-    if (likeCount < maxLike && followCount < maxFollow) {
+    if (!isBanned && likeCount < maxLike && followCount < maxFollow) {
       console.log('Sleeping', maxLike - likeCount, maxFollow - followCount)
       await instagramBot.randomPause(60 * 3)
       likeAndFollow()
     } else {
-      console.log('Like and follow finished, next run', likeAndFollowJob.nextInvocation()._date.format('HH:mm DD/MM'))
+      console.log('Like and follow finished, next run', likeAndFollowJob.nextInvocation()._date.format('HH:mm DD/MM'), 'isBanned', isBanned, isStillBanned)
+      if (!isStillBanned) isBanned = false
     }
   }
 }
@@ -46,25 +54,32 @@ function getRandomInt (min, max) {
 }
 
 function randomLikeAndFollowCounts () {
-  maxLike = getRandomInt(140,60)
+  maxLike = getRandomInt(140, 60)
   maxFollow = getRandomInt(40, 80)
 }
 
-function shuffle(a) {
-  var j, x, i;
+function shuffle (a) {
+  var j, x, i
   for (i = a.length - 1; i > 0; i--) {
-    j = Math.floor(Math.random() * (i + 1));
-    x = a[i];
-    a[i] = a[j];
-    a[j] = x;
+    j = Math.floor(Math.random() * (i + 1))
+    x = a[i]
+    a[i] = a[j]
+    a[j] = x
   }
-  return a;
+  return a
 }
 
 const likeAndFollowJob = nodeSchedule.scheduleJob('Like and follow', '0 0 7,13,18 * * * *', () => {
   followCount = 0
   likeCount = 0
-  setTimeout(likeAndFollow, 1000 * getRandomInt(60*60, 0))
+  if (!isBanned) {
+    maxLike = 100
+    maxFollow = 60
+  } else {
+    maxLike = 20
+    maxFollow = 8
+  }
+  setTimeout(likeAndFollow, 1000 * getRandomInt(60 * 60, 0))
 })
 
 const unfollowJob = nodeSchedule.scheduleJob('Unfollow', '0 0 5 * * * *', unfollowNotFollowing)
